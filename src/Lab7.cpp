@@ -9,6 +9,7 @@
 #include "oled-wing-adafruit.h"
 #include "basicLibrary.ino" // Custom class mentioned below
 
+void notification();
 void setup();
 void loop();
 void printToOled(String msg);
@@ -22,6 +23,15 @@ SYSTEM_THREAD(ENABLED)
 OledWingAdafruit display;
 
 Temperature tempMonitor; // A class for the temperature sensor
+
+volatile bool displayMessage = false;
+
+Timer notificationTimer(5000, notification, true);
+
+void notification()
+{
+  displayMessage = false;
+}
 
 void setup()
 {
@@ -42,18 +52,23 @@ void loop()
   display.clearDisplay();
   if (display.pressedA())
   {
-    display.clearDisplay();
+    displayMessage = true;
+    notificationTimer.start();
     Blynk.logEvent(BUTTON_A_CLICKED_EVENT, BUTTON_A_CLICKED_MSG);
-    printToOled("Sent Notification");
-    display.display();
-    delay(5000);
   }
   Blynk.virtualWrite(V0, tempMonitor.celcius);
   Blynk.virtualWrite(V2, tempMonitor.fahrenheit);
-  printToOled("Fahrenheit:");
-  printToOled((String)tempMonitor.fahrenheit); // One of the values of the Temperature class
-  printToOled("Celcius:");
-  printToOled((String)tempMonitor.celcius);
+  if (displayMessage)
+  {
+    printToOled("Sent Notification");
+  }
+  else
+  {
+    printToOled("Fahrenheit:");
+    printToOled((String)tempMonitor.fahrenheit); // One of the values of the Temperature class
+    printToOled("Celcius:");
+    printToOled((String)tempMonitor.celcius);
+  }
   display.display();
 }
 
