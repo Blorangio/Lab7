@@ -28,22 +28,28 @@ void loop()
   update(); // This is the classes update
   Blynk.run();
   display.loop();
+  display.setCursor(0, 0);
+  display.clearDisplay();
   if (display.pressedA())
   {
+    display.clearDisplay();
     Blynk.logEvent(BUTTON_A_CLICKED_EVENT, BUTTON_A_CLICKED_MSG);
     printToOled("Sent Notification");
-    delay(3000);
+    display.display();
+    delay(5000);
   }
-  Blynk.virtualWrite(V0, tempMonitor.fahrenheit);
+  Blynk.virtualWrite(V0, tempMonitor.celcius);
+  Blynk.virtualWrite(V2, tempMonitor.fahrenheit);
+  printToOled("Fahrenheit:");
   printToOled((String)tempMonitor.fahrenheit); // One of the values of the Temperature class
+  printToOled("Celcius:");
+  printToOled((String)tempMonitor.celcius);
+  display.display();
 }
 
 void printToOled(String msg)
 {
-  display.clearDisplay();
-  display.setTextSize(2);
+  display.setTextSize(1);
   display.setTextColor(WHITE);
-  display.setCursor(0, 0);
   display.println(msg);
-  display.display();
 }
